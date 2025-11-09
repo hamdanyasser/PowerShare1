@@ -549,6 +549,260 @@ window.PowerShareApp = {
     confirmAction
 };
 
+// ===== MODERN HOME PAGE ANIMATIONS =====
+
+// Counter Animation for Stats
+function animateCounters() {
+    const counters = document.querySelectorAll('.stat-number');
+    const speed = 200; // Animation speed
+
+    counters.forEach(counter => {
+        const animate = () => {
+            const value = +counter.getAttribute('data-target');
+            const data = +counter.innerText.replace(/[^0-9]/g, '');
+
+            const time = value / speed;
+            if (data < value) {
+                const increment = Math.ceil(time);
+                counter.innerText = data + increment;
+                setTimeout(animate, 1);
+            } else {
+                counter.innerText = value + (value === 99 ? '%' : '+');
+            }
+        };
+        animate();
+    });
+}
+
+// Intersection Observer for Scroll Animations
+function initScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('aos-animate');
+
+                // Trigger counter animation when stats section is visible
+                if (entry.target.closest('.stats-section')) {
+                    const counters = entry.target.querySelectorAll('.stat-number');
+                    if (counters.length > 0) {
+                        animateCounters();
+                    }
+                }
+
+                // Unobserve after animation
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Observe all elements with data-aos attribute
+    document.querySelectorAll('[data-aos]').forEach(element => {
+        observer.observe(element);
+    });
+
+    // Observe stats section
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) {
+        observer.observe(statsSection);
+    }
+}
+
+// Parallax effect for hero shapes
+function initParallaxEffect() {
+    const hero = document.querySelector('.hero-modern');
+    if (!hero) return;
+
+    const shapes = document.querySelectorAll('.shape');
+
+    window.addEventListener('mousemove', (e) => {
+        const mouseX = e.clientX / window.innerWidth;
+        const mouseY = e.clientY / window.innerHeight;
+
+        shapes.forEach((shape, index) => {
+            const speed = (index + 1) * 20;
+            const x = (mouseX - 0.5) * speed;
+            const y = (mouseY - 0.5) * speed;
+
+            shape.style.transform = `translate(${x}px, ${y}px)`;
+        });
+    });
+}
+
+// Smooth reveal on scroll
+function initSmoothReveal() {
+    const cards = document.querySelectorAll('.feature-card-modern, .step-card, .testimonial-card, .pricing-card-modern');
+
+    const revealOptions = {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const revealOnScroll = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, revealOptions);
+
+    cards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'all 0.6s ease-out';
+        revealOnScroll.observe(card);
+    });
+}
+
+// Add floating animation to hero illustration cards
+function initHeroCardAnimations() {
+    const illustrationCards = document.querySelectorAll('.illustration-card');
+
+    illustrationCards.forEach((card, index) => {
+        // Add slight rotation on hover
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px) rotate(3deg)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) rotate(0deg)';
+        });
+    });
+}
+
+// Typing effect for hero title (optional)
+function initTypingEffect() {
+    const gradientText = document.querySelector('.gradient-text');
+    if (!gradientText) return;
+
+    const text = gradientText.textContent;
+    gradientText.textContent = '';
+    gradientText.style.opacity = '1';
+
+    let index = 0;
+    const typingSpeed = 100;
+
+    function type() {
+        if (index < text.length) {
+            gradientText.textContent += text.charAt(index);
+            index++;
+            setTimeout(type, typingSpeed);
+        }
+    }
+
+    // Start typing after a delay
+    setTimeout(type, 1000);
+}
+
+// Add ripple effect to buttons
+function initButtonRipple() {
+    const buttons = document.querySelectorAll('.btn-hero-primary, .btn-hero-secondary, .btn-pricing');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+
+            this.appendChild(ripple);
+
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+}
+
+// Add tilt effect to pricing cards
+function initCardTilt() {
+    const pricingCards = document.querySelectorAll('.pricing-card-modern');
+
+    pricingCards.forEach(card => {
+        card.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+
+            this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+        });
+    });
+}
+
+// Initialize all home page animations
+function initHomePageAnimations() {
+    // Check if we're on the home page
+    const isHomePage = document.querySelector('.hero-modern');
+    if (!isHomePage) return;
+
+    console.log('Initializing home page animations...');
+
+    // Initialize all animations
+    initScrollAnimations();
+    initParallaxEffect();
+    initSmoothReveal();
+    initHeroCardAnimations();
+    initButtonRipple();
+    initCardTilt();
+
+    // Optional: Uncomment for typing effect
+    // initTypingEffect();
+
+    console.log('Home page animations initialized successfully');
+}
+
+// Add CSS for ripple effect
+const rippleStyle = document.createElement('style');
+rippleStyle.textContent = `
+    .btn {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: ripple-animation 0.6s ease-out;
+        pointer-events: none;
+    }
+
+    @keyframes ripple-animation {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(rippleStyle);
+
 // ===== END OF SCRIPT =====
 console.log('PowerShare JavaScript loaded successfully');
+
+// Initialize home page animations when DOM is loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHomePageAnimations);
+} else {
+    initHomePageAnimations();
+}
 
