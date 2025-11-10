@@ -101,6 +101,61 @@ class UserController {
             });
         }
     }
+
+    // Get user notification preferences
+    async getNotificationPreferences(req, res) {
+        try {
+            const userId = req.user.user_id;
+            const preferences = await userDAL.getUserPreferences(userId);
+
+            if (!preferences) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'User preferences not found'
+                });
+            }
+
+            res.json({
+                success: true,
+                data: preferences
+            });
+        } catch (error) {
+            console.error('Get preferences error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to fetch preferences'
+            });
+        }
+    }
+
+    // Update user notification preferences (new method with all fields)
+    async updateNotificationPreferences(req, res) {
+        try {
+            const userId = req.user.user_id;
+            const { email_notifications, outage_alerts, sms_notifications, theme } = req.body;
+
+            const preferences = {
+                email_notifications: email_notifications !== undefined ? email_notifications : true,
+                outage_alerts: outage_alerts !== undefined ? outage_alerts : true,
+                sms_notifications: sms_notifications !== undefined ? sms_notifications : false,
+                theme: theme || 'light'
+            };
+
+            await userDAL.updateUserPreferences(userId, preferences);
+
+            res.json({
+                success: true,
+                message: 'Notification preferences updated successfully',
+                data: preferences
+            });
+        } catch (error) {
+            console.error('Update notification preferences error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to update notification preferences'
+            });
+        }
+    }
 }
 
 module.exports = new UserController();
