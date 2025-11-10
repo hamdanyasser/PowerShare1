@@ -162,15 +162,15 @@
                         <div class="card-body">
                             <h6 class="fw-bold mb-3">Email Notifications</h6>
                             <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="emailNotif" checked>
-                                <label class="form-check-label" for="emailNotif">
+                                <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                <label class="form-check-label" for="emailNotifications">
                                     <strong>Email Notifications</strong>
                                     <small class="d-block text-muted">Receive updates and alerts via email</small>
                                 </label>
                             </div>
                             <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="emailOutage" checked>
-                                <label class="form-check-label" for="emailOutage">
+                                <input class="form-check-input" type="checkbox" id="outageAlerts" checked>
+                                <label class="form-check-label" for="outageAlerts">
                                     <strong>Outage Alerts</strong>
                                     <small class="d-block text-muted">Get notified about power outages</small>
                                 </label>
@@ -180,8 +180,8 @@
 
                             <h6 class="fw-bold mb-3">SMS Notifications</h6>
                             <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="smsNotif">
-                                <label class="form-check-label" for="smsNotif">
+                                <input class="form-check-input" type="checkbox" id="smsNotifications">
+                                <label class="form-check-label" for="smsNotifications">
                                     <strong>SMS Alerts</strong>
                                     <small class="d-block text-muted">Receive critical alerts via text message</small>
                                 </label>
@@ -203,25 +203,21 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3">
-                                <label for="language" class="form-label">Language</label>
-                                <select class="form-select" id="language">
-                                    <option selected>English</option>
-                                    <option>Arabic (العربية)</option>
-                                    <option>French (Français)</option>
-                                </select>
+                            <h6 class="fw-bold mb-3">Theme Settings</h6>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                                <label class="form-check-label" for="darkModeToggle">
+                                    <strong>Dark Mode</strong>
+                                    <small class="d-block text-muted">Switch between light and dark theme</small>
+                                </label>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="timezone" class="form-label">Timezone</label>
-                                <select class="form-select" id="timezone">
-                                    <option selected>Asia/Beirut (GMT+2)</option>
-                                    <option>UTC</option>
-                                    <option>Europe/Paris (GMT+1)</option>
-                                </select>
+                            <div class="alert alert-info mt-3" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Your theme preference will be saved and applied across all pages.
                             </div>
 
-                            <button class="btn btn-primary mt-3" onclick="saveDisplayPreferences()">
+                            <button class="btn btn-primary mt-3" onclick="saveThemePreferences()">
                                 <i class="fas fa-save me-2"></i>Save Preferences
                             </button>
                         </div>
@@ -440,31 +436,101 @@
         }
     });
 
+    // Load notification preferences on page load
+    async function loadNotificationPreferences() {
+        try {
+            const response = await fetch('/api/users/settings/notifications', {
+                credentials: 'include'
+            });
+
+            const result = await response.json();
+
+            if (result.success && result.data) {
+                const preferences = result.data;
+
+                // Set toggle states from database
+                document.getElementById('emailNotifications').checked = preferences.email_notifications;
+                document.getElementById('outageAlerts').checked = preferences.outage_alerts;
+                document.getElementById('smsNotifications').checked = preferences.sms_notifications;
+
+                // Set theme toggle
+                if (preferences.theme === 'dark') {
+                    document.getElementById('darkModeToggle').checked = true;
+                }
+            }
+        } catch (error) {
+            console.error('Load preferences error:', error);
+        }
+    }
+
     // Save notification settings
-    function saveNotificationSettings() {
-        const emailNotif = document.getElementById('emailNotif').checked;
-        const emailOutage = document.getElementById('emailOutage').checked;
-        const smsNotif = document.getElementById('smsNotif').checked;
+    async function saveNotificationSettings() {
+        const emailNotifications = document.getElementById('emailNotifications').checked;
+        const outageAlerts = document.getElementById('outageAlerts').checked;
+        const smsNotifications = document.getElementById('smsNotifications').checked;
 
-        // Save to localStorage for now
-        localStorage.setItem('emailNotif', emailNotif);
-        localStorage.setItem('emailOutage', emailOutage);
-        localStorage.setItem('smsNotif', smsNotif);
+        try {
+            const response = await fetch('/api/users/settings/notifications', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    email_notifications: emailNotifications,
+                    outage_alerts: outageAlerts,
+                    sms_notifications: smsNotifications,
+                    theme: document.getElementById('darkModeToggle').checked ? 'dark' : 'light'
+                })
+            });
 
-        alert('Notification settings saved successfully!');
+            const result = await response.json();
+
+            if (result.success) {
+                alert('Notification settings saved successfully!');
+            } else {
+                alert('Failed to save notification settings: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Save notification settings error:', error);
+            alert('Failed to save notification settings. Please try again.');
+        }
     }
 
-    // Save display preferences
-    function saveDisplayPreferences() {
-        const language = document.getElementById('language').value;
-        const timezone = document.getElementById('timezone').value;
+    // Save theme preferences
+    async function saveThemePreferences() {
+        const darkMode = document.getElementById('darkModeToggle').checked;
+        const theme = darkMode ? 'dark' : 'light';
 
-        // Save to localStorage for now
-        localStorage.setItem('language', language);
-        localStorage.setItem('timezone', timezone);
+        try {
+            const response = await fetch('/api/users/settings/notifications', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    email_notifications: document.getElementById('emailNotifications').checked,
+                    outage_alerts: document.getElementById('outageAlerts').checked,
+                    sms_notifications: document.getElementById('smsNotifications').checked,
+                    theme: theme
+                })
+            });
 
-        alert('Display preferences saved successfully!');
+            const result = await response.json();
+
+            if (result.success) {
+                alert('Theme preferences saved successfully!');
+                // You can add theme application logic here if needed
+            } else {
+                alert('Failed to save theme preferences: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Save theme preferences error:', error);
+            alert('Failed to save theme preferences. Please try again.');
+        }
     }
+
+    // Load preferences when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadNotificationPreferences();
+    });
 </script>
 
 <style>

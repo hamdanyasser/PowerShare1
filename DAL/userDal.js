@@ -79,6 +79,25 @@ class UserDAL {
             [hashed, userId]
         );
     }
+
+    // Get user notification preferences
+    async getUserPreferences(userId) {
+        const [rows] = await db.execute(
+            'SELECT email_notifications, outage_alerts, sms_notifications, theme FROM users WHERE user_id = ?',
+            [userId]
+        );
+        return rows[0];
+    }
+
+    // Update user notification preferences
+    async updateUserPreferences(userId, preferences) {
+        const { email_notifications, outage_alerts, sms_notifications, theme } = preferences;
+
+        await db.execute(
+            'UPDATE users SET email_notifications = ?, outage_alerts = ?, sms_notifications = ?, theme = ? WHERE user_id = ?',
+            [email_notifications, outage_alerts, sms_notifications, theme, userId]
+        );
+    }
 }
 
 module.exports = new UserDAL();
