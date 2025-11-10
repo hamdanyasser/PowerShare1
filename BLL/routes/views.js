@@ -81,15 +81,15 @@ router.get('/generators', authenticateView, (req, res) => {
 });
 
 
-// Logout route
+// Logout route (JWT cookie only)
 router.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('Logout error:', err);
-        }
-        res.clearCookie('token');
-        res.redirect('/login');
+    // Clear the JWT cookie
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
     });
+    res.redirect('/login');
 });
 
 // Admin-specific routes

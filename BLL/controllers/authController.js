@@ -160,21 +160,13 @@ class AuthController {
                 { expiresIn: '7d' }
             );
 
-            // ✅ Store in cookie
+            // ✅ Store in httpOnly cookie (secure, persists after browser close)
             res.cookie('token', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
-
-            // ✅ Store session info (optional)
-            req.session.user = {
-                user_id: user.user_id,
-                full_name: user.full_name,
-                email: user.email,
-                role: user.role,
-            };
 
             delete user.password_hash;
 
@@ -194,22 +186,19 @@ class AuthController {
     }
 
 
-    // Logout user
+    // Logout user (clear JWT cookie only)
     async logout(req, res) {
         try {
-            req.session.destroy((err) => {
-                if (err) {
-                    console.error('Logout error:', err);
-                    return res.status(500).json({
-                        success: false,
-                        message: 'Logout failed'
-                    });
-                }
+            // Clear the JWT cookie
+            res.clearCookie('token', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax'
+            });
 
-                res.json({
-                    success: true,
-                    message: 'Logged out successfully'
-                });
+            res.json({
+                success: true,
+                message: 'Logged out successfully'
             });
         } catch (error) {
             console.error('Logout error:', error);
@@ -220,17 +209,18 @@ class AuthController {
         }
     }
 
-    // Get current user
+    // Get current user (uses JWT from middleware)
     async getCurrentUser(req, res) {
         try {
-            if (!req.session.user) {
+            // req.user is set by authenticate middleware from JWT cookie
+            if (!req.user) {
                 return res.status(401).json({
                     success: false,
                     message: 'Not authenticated'
                 });
             }
 
-            const user = await userDAL.findById(req.session.user.user_id);
+            const user = await userDAL.findById(req.user.user_id);
 
             if (!user) {
                 return res.status(404).json({

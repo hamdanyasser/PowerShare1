@@ -13,10 +13,19 @@ CREATE TABLE users (
                        address TEXT,
                        profile_image VARCHAR(255) DEFAULT NULL,
                        role ENUM('household', 'owner', 'admin') DEFAULT 'household',
+                       status ENUM('active', 'suspended', 'inactive') DEFAULT 'active',
+                       email_notifications BOOLEAN DEFAULT TRUE,
+                       sms_notifications BOOLEAN DEFAULT TRUE,
+                       reminder_notifications BOOLEAN DEFAULT TRUE,
+                       outage_alerts BOOLEAN DEFAULT TRUE,
+                       theme ENUM('light', 'dark') DEFAULT 'light',
+                       reset_token VARCHAR(255) DEFAULT NULL,
+                       reset_token_expires DATETIME DEFAULT NULL,
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                        INDEX idx_email (email),
-                       INDEX idx_role (role)
+                       INDEX idx_role (role),
+                       INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Generators Table
@@ -130,7 +139,11 @@ CREATE TABLE notifications (
 
 -- Sample Users (Password: password123 for all)
 INSERT INTO users (full_name, email, password_hash, phone, address, role) VALUES
-    ('Admin User', 'admin@gmail.com', '$2a$12$3RCBXMaggMkMblI7bBQacOIS8xRVlMmQaT5I8fJjNKiCqo/UwvAB.', '+961 11 111 111', 'Beirut, Lebanon', 'admin');
+    ('Admin User', 'admin@gmail.com', '$2a$12$3RCBXMaggMkMblI7bBQacOIS8xRVlMmQaT5I8fJjNKiCqo/UwvAB.', '+96111111111', 'Beirut, Lebanon', 'admin'),
+    ('Owner User', 'owner@gmail.com', '$2a$12$3RCBXMaggMkMblI7bBQacOIS8xRVlMmQaT5I8fJjNKiCqo/UwvAB.', '+96111111112', 'Beirut, Lebanon', 'owner'),
+    ('Household One', 'house1@gmail.com', '$2a$12$3RCBXMaggMkMblI7bBQacOIS8xRVlMmQaT5I8fJjNKiCqo/UwvAB.', '+96111111113', 'Beirut, Lebanon', 'household'),
+    ('Household Two', 'house2@gmail.com', '$2a$12$3RCBXMaggMkMblI7bBQacOIS8xRVlMmQaT5I8fJjNKiCqo/UwvAB.', '+96111111114', 'Beirut, Lebanon', 'household'),
+    ('Household Three', 'house3@gmail.com', '$2a$12$3RCBXMaggMkMblI7bBQacOIS8xRVlMmQaT5I8fJjNKiCqo/UwvAB.', '+96111111115', 'Beirut, Lebanon', 'household');
 -- Sample Generators
 INSERT INTO generators (owner_id, generator_name, location, capacity_kw, status) VALUES
                                                                                      (2, 'Beirut Central Generator', 'Achrafieh, Beirut', 500.00, 'active'),
@@ -227,17 +240,6 @@ SELECT
         WHERE p.status = 'completed'
         GROUP BY g.generator_id, YEAR(p.payment_date), MONTH(p.payment_date);
 
--- Success message
-SELECT 'Database created successfully!' AS Status;
-SELECT 'Sample data inserted!' AS Status;
-SELECT 'Views created!' AS Status;
-
-USE powershare_db;
-
-ALTER TABLE users
-    ADD COLUMN reset_token VARCHAR(255) DEFAULT NULL,
-ADD COLUMN reset_token_expires DATETIME DEFAULT NULL;
-
 -- Payment Methods Table
 CREATE TABLE IF NOT EXISTS payment_methods (
     payment_method_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -256,10 +258,10 @@ CREATE TABLE IF NOT EXISTS payment_methods (
 
 -- Insert sample payment methods for testing
 INSERT INTO payment_methods (user_id, card_type, card_last_four, card_holder_name, expiry_month, expiry_year, is_default) VALUES
-(1, 'visa', '4242', 'John Doe', '12', '2026', TRUE),
-(1, 'mastercard', '8888', 'John Doe', '09', '2027', FALSE);
+(1, 'visa', '4242', 'Admin User', '12', '2026', TRUE),
+(1, 'mastercard', '8888', 'Admin User', '09', '2027', FALSE);
 
-Delete from users where user_id =12;
-
-Select * from generators;
-Select * from users;
+-- Success message
+SELECT 'Database created successfully!' AS Status;
+SELECT 'Sample data inserted!' AS Status;
+SELECT 'All tables, views, and preferences configured!' AS Status;
