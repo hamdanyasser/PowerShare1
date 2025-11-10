@@ -1859,5 +1859,261 @@ button:focus,
     top: 0;
 }
 
+/* ========================================
+   DARK MODE THEME
+   ======================================== */
+
+/* Dark mode variables */
+body.dark-mode {
+    --primary-color: #818CF8;
+    --primary-dark: #6366F1;
+    --primary-light-color: #A5B4FC;
+    --secondary-color: #2DD4BF;
+    --secondary-dark: #14B8A6;
+    --success-color: #34D399;
+    --danger-color: #F87171;
+    --warning-color: #FBBF24;
+    --info-color: #22D3EE;
+
+    /* Dark backgrounds */
+    --light-color: #1F2937;
+    --dark-color: #F9FAFB;
+    --text-dark: #F9FAFB;
+    --text-muted: #D1D5DB;
+
+    /* Light backgrounds with dark mode opacity */
+    --primary-light: rgba(129, 140, 248, 0.15);
+    --secondary-light: rgba(45, 212, 191, 0.15);
+    --success-light: rgba(52, 211, 153, 0.15);
+    --danger-light: rgba(248, 113, 113, 0.15);
+    --warning-light: rgba(251, 191, 36, 0.15);
+    --info-light: rgba(34, 211, 238, 0.15);
+
+    /* Dark mode shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Dark mode body */
+body.dark-mode {
+    background-color: #111827 !important;
+    color: #F9FAFB;
+}
+
+/* Dark mode cards */
+body.dark-mode .card {
+    background-color: #1F2937;
+    border-color: #374151;
+    color: #F9FAFB;
+}
+
+body.dark-mode .card-header {
+    background-color: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .card-body {
+    background-color: #1F2937;
+    color: #F9FAFB;
+}
+
+/* Dark mode forms */
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+    background-color: #4B5563;
+    border-color: var(--primary-color);
+    color: #F9FAFB;
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #9CA3AF;
+}
+
+body.dark-mode .form-label {
+    color: #D1D5DB;
+}
+
+/* Dark mode tables */
+body.dark-mode table {
+    color: #F9FAFB;
+}
+
+body.dark-mode .table {
+    --bs-table-bg: #1F2937;
+    --bs-table-striped-bg: #374151;
+    --bs-table-hover-bg: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .table thead {
+    background-color: #374151;
+    color: #F9FAFB;
+}
+
+body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) > * {
+    color: #F9FAFB;
+}
+
+/* Dark mode navbar */
+body.dark-mode .navbar {
+    background-color: #1F2937 !important;
+    border-bottom: 1px solid #374151;
+}
+
+body.dark-mode .navbar-dark .navbar-brand,
+body.dark-mode .navbar-dark .navbar-nav .nav-link {
+    color: #F9FAFB;
+}
+
+/* Dark mode modals */
+body.dark-mode .modal-content {
+    background-color: #1F2937;
+    color: #F9FAFB;
+}
+
+body.dark-mode .modal-header {
+    border-color: #374151;
+}
+
+body.dark-mode .modal-footer {
+    border-color: #374151;
+}
+
+body.dark-mode .modal-header .btn-close {
+    filter: invert(1);
+}
+
+/* Dark mode badges */
+body.dark-mode .badge {
+    background-color: #374151 !important;
+    color: #F9FAFB;
+}
+
+/* Dark mode alerts */
+body.dark-mode .alert {
+    background-color: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+/* Dark mode list group */
+body.dark-mode .list-group-item {
+    background-color: #1F2937;
+    border-color: #374151;
+    color: #F9FAFB;
+}
+
+/* Dark mode nav tabs/pills */
+body.dark-mode .nav-tabs .nav-link,
+body.dark-mode .nav-pills .nav-link {
+    color: #D1D5DB;
+}
+
+body.dark-mode .nav-tabs .nav-link.active,
+body.dark-mode .nav-pills .nav-link.active {
+    background-color: var(--primary-color);
+    color: #FFFFFF;
+}
+
+/* Dark mode text colors */
+body.dark-mode .text-muted {
+    color: #9CA3AF !important;
+}
+
+body.dark-mode .text-dark {
+    color: #F9FAFB !important;
+}
+
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3,
+body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
+    color: #F9FAFB;
+}
+
+/* Dark mode dropdown */
+body.dark-mode .dropdown-menu {
+    background-color: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .dropdown-item {
+    color: #F9FAFB;
+}
+
+body.dark-mode .dropdown-item:hover,
+body.dark-mode .dropdown-item:focus {
+    background-color: #374151;
+    color: #F9FAFB;
+}
+
+/* Dark mode pagination */
+body.dark-mode .pagination .page-link {
+    background-color: #1F2937;
+    border-color: #374151;
+    color: #F9FAFB;
+}
+
+body.dark-mode .pagination .page-link:hover {
+    background-color: #374151;
+    border-color: #4B5563;
+}
+
+body.dark-mode .pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Dark mode accordion */
+body.dark-mode .accordion-item {
+    background-color: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .accordion-button {
+    background-color: #374151;
+    color: #F9FAFB;
+}
+
+body.dark-mode .accordion-button:not(.collapsed) {
+    background-color: #4B5563;
+    color: #F9FAFB;
+}
+
+/* Dark mode breadcrumb */
+body.dark-mode .breadcrumb {
+    background-color: #1F2937;
+}
+
+body.dark-mode .breadcrumb-item + .breadcrumb-item::before {
+    color: #9CA3AF;
+}
+
+/* Dark mode progress bar */
+body.dark-mode .progress {
+    background-color: #374151;
+}
+
+/* Smooth transitions for theme changes */
+body,
+.card,
+.form-control,
+.form-select,
+.table,
+.navbar,
+.modal-content,
+.dropdown-menu {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
 /* === End of Styles === */
+
 

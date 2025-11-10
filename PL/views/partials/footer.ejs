@@ -85,5 +85,95 @@
 <script src="/js/script.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/pdf-utils.js"></script>
+
+<!-- Theme Manager Script -->
+<script>
+    (async function() {
+        // Apply theme class to body
+        function applyTheme(theme) {
+            const body = document.body;
+            const html = document.documentElement;
+
+            if (theme === 'dark') {
+                body.classList.add('dark-mode');
+                html.classList.add('dark-mode');
+                body.classList.remove('bg-light');
+            } else {
+                body.classList.remove('dark-mode');
+                html.classList.remove('dark-mode');
+                if (!body.classList.contains('bg-light')) {
+                    body.classList.add('bg-light');
+                }
+            }
+
+            // Save to localStorage for instant loading on next page
+            localStorage.setItem('theme', theme);
+        }
+
+        // Load theme from database (authenticated users only)
+        async function loadThemeFromDatabase() {
+            try {
+                const response = await fetch('/api/users/settings/notifications', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data && result.data.theme) {
+                        applyTheme(result.data.theme);
+                    }
+                } else {
+                    // Not authenticated, use localStorage
+                    const savedTheme = localStorage.getItem('theme') || 'light';
+                    applyTheme(savedTheme);
+                }
+            } catch (error) {
+                // Error or not authenticated, use localStorage
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                applyTheme(savedTheme);
+            }
+        }
+
+        // Check if user is on login/register page (public pages)
+        const isPublicPage = window.location.pathname === '/login' ||
+                            window.location.pathname === '/register' ||
+                            window.location.pathname === '/';
+
+        if (isPublicPage) {
+            // For public pages, just use localStorage
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(savedTheme);
+        } else {
+            // For authenticated pages, sync with database
+            await loadThemeFromDatabase();
+        }
+
+        // Apply initial theme from the temporary class if it exists
+        if (document.documentElement.classList.contains('dark-mode-loading')) {
+            document.documentElement.classList.remove('dark-mode-loading');
+            applyTheme('dark');
+        }
+    })();
+
+    // Expose applyTheme globally for use in profile settings
+    window.applyTheme = function(theme) {
+        const body = document.body;
+        const html = document.documentElement;
+
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            html.classList.add('dark-mode');
+            body.classList.remove('bg-light');
+        } else {
+            body.classList.remove('dark-mode');
+            html.classList.remove('dark-mode');
+            if (!body.classList.contains('bg-light')) {
+                body.classList.add('bg-light');
+            }
+        }
+
+        localStorage.setItem('theme', theme);
+    };
+</script>
 </body>
 </html>
