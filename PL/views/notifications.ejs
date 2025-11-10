@@ -270,9 +270,23 @@
     async function clearAll() {
         if (!confirm('Are you sure you want to clear all notifications? This cannot be undone.')) return;
 
-        // In production, call API to delete all notifications
-        alert('Notifications cleared');
-        await loadNotifications();
+        try {
+            const response = await fetch('/api/notifications/all', {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('All notifications cleared successfully');
+                await loadNotifications();
+            } else {
+                alert('Failed to clear notifications: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Clear all notifications error:', error);
+            alert('Failed to clear notifications. Please try again.');
+        }
     }
 
     function getNotifColor(type) {
@@ -306,8 +320,11 @@
         }
 
         if (!notif.is_read) {
-            actions += `<button class="btn btn-sm btn-outline-secondary" onclick="markAsRead(${notif.notification_id})"><i class="fas fa-check me-1"></i>Mark Read</button>`;
+            actions += `<button class="btn btn-sm btn-outline-secondary me-2" onclick="markAsRead(${notif.notification_id})"><i class="fas fa-check me-1"></i>Mark Read</button>`;
         }
+
+        // Add delete button for all notifications
+        actions += `<button class="btn btn-sm btn-outline-danger" onclick="deleteNotification(${notif.notification_id})"><i class="fas fa-trash me-1"></i>Delete</button>`;
 
         return actions;
     }
@@ -332,6 +349,28 @@
         const today = new Date();
         const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
         return date >= weekAgo;
+    }
+
+    // Delete single notification
+    async function deleteNotification(notificationId) {
+        if (!confirm('Delete this notification?')) return;
+
+        try {
+            const response = await fetch(`/api/notifications/${notificationId}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                await loadNotifications();
+            } else {
+                alert('Failed to delete notification: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Delete notification error:', error);
+            alert('Failed to delete notification. Please try again.');
+        }
     }
 </script>
 

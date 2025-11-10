@@ -58,6 +58,11 @@ class NotificationDAL {
         await db.execute('DELETE FROM notifications WHERE notification_id = ?', [notificationId]);
     }
 
+    // Delete all notifications for a user
+    async deleteAllByUserId(userId) {
+        await db.execute('DELETE FROM notifications WHERE user_id = ?', [userId]);
+    }
+
     // Bulk create notifications for subscribers
     async notifySubscribers(generatorId, title, message, type) {
         await db.execute(

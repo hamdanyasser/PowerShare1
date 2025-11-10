@@ -119,6 +119,26 @@ class NotificationController {
             });
         }
     }
+
+    // Delete all notifications for a user
+    async deleteAllNotifications(req, res) {
+        try {
+            const userId = req.user.user_id;
+
+            await notificationDAL.deleteAllByUserId(userId);
+
+            res.json({
+                success: true,
+                message: 'All notifications deleted successfully'
+            });
+        } catch (error) {
+            console.error('Delete all notifications error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to delete all notifications'
+            });
+        }
+    }
 }
 
 module.exports = new NotificationController();

@@ -356,17 +356,33 @@
     }
 
     // Save notification preferences
-    function saveNotificationPreferences() {
+    async function saveNotificationPreferences() {
         const emailNotif = document.getElementById('emailNotif').checked;
         const smsNotif = document.getElementById('smsNotif').checked;
         const reminderNotif = document.getElementById('reminderNotif').checked;
 
-        // Save to localStorage for now (in production, save to backend)
-        localStorage.setItem('emailNotif', emailNotif);
-        localStorage.setItem('smsNotif', smsNotif);
-        localStorage.setItem('reminderNotif', reminderNotif);
+        try {
+            const response = await fetch('/api/users/preferences', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email_notifications: emailNotif,
+                    sms_notifications: smsNotif,
+                    reminder_notifications: reminderNotif
+                })
+            });
 
-        alert('Notification preferences saved successfully!');
+            const result = await response.json();
+
+            if (result.success) {
+                alert('Notification preferences saved successfully!');
+            } else {
+                alert('Failed to save preferences: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Save preferences error:', error);
+            alert('Failed to save preferences. Please try again.');
+        }
     }
 </script>
 
