@@ -517,7 +517,10 @@
 
             if (result.success) {
                 alert('Theme preferences saved successfully!');
-                // You can add theme application logic here if needed
+                // Apply theme immediately
+                if (typeof window.applyTheme === 'function') {
+                    window.applyTheme(theme);
+                }
             } else {
                 alert('Failed to save theme preferences: ' + result.message);
             }
@@ -527,9 +530,26 @@
         }
     }
 
+    // Apply theme instantly when toggle is changed
+    function toggleThemeInstantly() {
+        const darkMode = document.getElementById('darkModeToggle').checked;
+        const theme = darkMode ? 'dark' : 'light';
+
+        // Apply theme immediately without saving to database
+        if (typeof window.applyTheme === 'function') {
+            window.applyTheme(theme);
+        }
+    }
+
     // Load preferences when page loads
     document.addEventListener('DOMContentLoaded', function() {
         loadNotificationPreferences();
+
+        // Add instant theme toggle listener
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('change', toggleThemeInstantly);
+        }
     });
 </script>
 
