@@ -138,10 +138,19 @@ class AdminController {
         try {
             const { userId } = req.params;
             const { status } = req.body;
-            
-            // Note: You'll need to add a status field to users table if not exists
-            // For now, we'll just return success
-            
+
+            // Validate status value
+            const validStatuses = ['active', 'suspended', 'inactive'];
+            if (!status || !validStatuses.includes(status)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid status. Must be: active, suspended, or inactive'
+                });
+            }
+
+            // Update user status
+            await userDAL.updateUser(userId, { status });
+
             res.json({
                 success: true,
                 message: 'User status updated successfully'

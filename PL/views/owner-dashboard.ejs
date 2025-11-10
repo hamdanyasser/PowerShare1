@@ -701,9 +701,28 @@
                 const generator = generatorsData.data[0];
                 currentGeneratorId = generator.generator_id;
                 localStorage.setItem('generatorId', currentGeneratorId);
-                
+
                 await updateDashboardStats(generator);
                 await loadInitialData();
+            } else {
+                // No generators found - show onboarding message
+                document.getElementById('totalSubscribers').textContent = '0';
+                document.getElementById('monthlyRevenue').textContent = '$0.00';
+                document.getElementById('pendingPayments').textContent = '0';
+                document.getElementById('activePlans').textContent = '0';
+
+                // Show empty state message in dashboard section
+                const dashboardContent = document.querySelector('#dashboard .row.g-4');
+                if (dashboardContent) {
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'col-12 text-center mt-5';
+                    emptyState.innerHTML = `
+                        <i class="fas fa-solar-panel fa-4x text-muted mb-3"></i>
+                        <h4>No Generator Found</h4>
+                        <p class="text-muted">You haven't created a generator yet. Click "My Generators" to add your first generator.</p>
+                    `;
+                    dashboardContent.appendChild(emptyState);
+                }
             }
 
         } catch (error) {
@@ -733,12 +752,20 @@
             });
             const billsData = await billsResponse.json();
             const bills = billsData.success ? billsData.data : [];
-            
+
+            // Load payments data for accurate revenue calculation
+            const paymentsResponse = await fetch('/api/payments/generator/' + currentGeneratorId, {
+                credentials: 'include'
+            });
+            const paymentsData = await paymentsResponse.json();
+            const payments = paymentsData.success ? paymentsData.data : [];
+
             // Calculate stats
             const pendingBills = bills.filter(b => b.status === 'pending').length;
-            const totalRevenue = bills
-                .filter(b => b.status === 'paid')
-                .reduce((sum, b) => sum + parseFloat(b.amount), 0);
+            // Calculate revenue from completed payments (more accurate than bill status)
+            const totalRevenue = payments
+                .filter(p => p.status === 'completed')
+                .reduce((sum, p) => sum + parseFloat(p.amount), 0);
             
             // Update UI
             document.getElementById('totalSubscribers').textContent = subscriberCount;
@@ -1132,9 +1159,6 @@
                 break;
             case 'schedule':
                 await loadSchedules();
-                break;
-            case 'billing':
-                await loadBills();
                 break;
             case 'billing':
                 await loadBills();
@@ -1575,7 +1599,7 @@
                     <td>${bill.user_name || 'N/A'}</td>
                     <td>$${parseFloat(bill.amount).toFixed(2)}</td>
                     <td>${formatDate(bill.due_date)}</td>
-                    <td><span class="badge bg-${bill.status === 'paid' ? 'success' : bill.status === 'pending' ? 'warning' : 'secondary'}">${bill.status}</span></td>
+                    <td><span class="badge bg-${bill.status === 'paid' ? 'success' : bill.status === 'pending' ? 'warning' : bill.status === 'overdue' ? 'danger' : 'secondary'}">${bill.status}</span></td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary" onclick="viewBill(${bill.bill_id})">
                             <i class="fas fa-eye"></i>
@@ -1926,7 +1950,7 @@
                                     </tr>
                                     <tr>
                                         <th>Status:</th>
-                                        <td><span class="badge bg-${bill.status === 'paid' ? 'success' : bill.status === 'pending' ? 'warning' : 'secondary'}">${bill.status}</span></td>
+                                        <td><span class="badge bg-${bill.status === 'paid' ? 'success' : bill.status === 'pending' ? 'warning' : bill.status === 'overdue' ? 'danger' : 'secondary'}">${bill.status}</span></td>
                                     </tr>
                                     <tr>
                                         <th>Amount:</th>

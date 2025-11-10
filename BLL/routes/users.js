@@ -14,4 +14,7 @@ router.get('/:userId', authenticate, userController.getUserById);
 // Update user profile
 router.put('/profile', authenticate, upload.single('profile_image'), userController.updateProfile);
 
+// Update user preferences
+router.put('/preferences', authenticate, userController.updatePreferences);
+
 module.exports = router;

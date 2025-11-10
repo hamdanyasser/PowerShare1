@@ -753,7 +753,7 @@
                     <td>${user.full_name}</td>
                     <td>${user.email}</td>
                     <td><span class="badge bg-info">${capitalizeFirst(user.role)}</span></td>
-                    <td><span class="badge bg-success">Active</span></td>
+                    <td><span class="badge bg-${getStatusColor(user.status || 'active')}">${capitalizeFirst(user.status || 'active')}</span></td>
                     <td>${formatDate(user.created_at)}</td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary" onclick="viewUser(${user.user_id})" title="View Details">
@@ -1105,6 +1105,133 @@
     }
 
     // Show Notification Function
+    // Export Functions
+    function convertToCSV(data, headers) {
+        if (!data || data.length === 0) return '';
+
+        // Create header row
+        const headerRow = headers.join(',');
+
+        // Create data rows
+        const dataRows = data.map(row => {
+            return headers.map(header => {
+                let value = row[header];
+                // Handle null/undefined
+                if (value === null || value === undefined) value = '';
+                // Escape quotes and wrap in quotes if contains comma
+                value = String(value).replace(/"/g, '""');
+                if (value.includes(',') || value.includes('\n')) {
+                    value = `"${value}"`;
+                }
+                return value;
+            }).join(',');
+        }).join('\n');
+
+        return `${headerRow}\n${dataRows}`;
+    }
+
+    function downloadCSV(csv, filename) {
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showNotification('Export completed successfully!', 'success');
+    }
+
+    async function exportUsers() {
+        try {
+            const response = await fetch('/api/admin/users');
+            const result = await response.json();
+
+            if (!result.success || !result.data || result.data.length === 0) {
+                showNotification('No users to export', 'warning');
+                return;
+            }
+
+            const csv = convertToCSV(result.data, ['user_id', 'full_name', 'email', 'phone', 'role', 'status', 'created_at']);
+            downloadCSV(csv, `users_export_${new Date().toISOString().split('T')[0]}.csv`);
+        } catch (error) {
+            console.error('Export users error:', error);
+            showNotification('Failed to export users', 'danger');
+        }
+    }
+
+    async function exportGenerators() {
+        try {
+            const response = await fetch('/api/admin/generators');
+            const result = await response.json();
+
+            if (!result.success || !result.data || result.data.length === 0) {
+                showNotification('No generators to export', 'warning');
+                return;
+            }
+
+            const csv = convertToCSV(result.data, ['generator_id', 'generator_name', 'owner_name', 'location', 'capacity_kw', 'status', 'subscriber_count', 'total_revenue']);
+            downloadCSV(csv, `generators_export_${new Date().toISOString().split('T')[0]}.csv`);
+        } catch (error) {
+            console.error('Export generators error:', error);
+            showNotification('Failed to export generators', 'danger');
+        }
+    }
+
+    async function exportPayments() {
+        try {
+            const response = await fetch('/api/admin/payments');
+            const result = await response.json();
+
+            if (!result.success || !result.data || result.data.length === 0) {
+                showNotification('No payments to export', 'warning');
+                return;
+            }
+
+            const csv = convertToCSV(result.data, ['payment_id', 'user_name', 'generator_name', 'amount', 'payment_method', 'payment_date', 'status']);
+            downloadCSV(csv, `payments_export_${new Date().toISOString().split('T')[0]}.csv`);
+        } catch (error) {
+            console.error('Export payments error:', error);
+            showNotification('Failed to export payments', 'danger');
+        }
+    }
+
+    async function exportReport() {
+        try {
+            // Export dashboard statistics and growth data
+            const statsResponse = await fetch('/api/admin/dashboard/stats');
+            const statsResult = await statsResponse.json();
+
+            if (!statsResult.success) {
+                showNotification('Failed to load dashboard statistics', 'danger');
+                return;
+            }
+
+            // Create a comprehensive report
+            const report = [];
+            const overview = statsResult.data.overview;
+
+            report.push(['PowerShare Platform Report']);
+            report.push(['Generated on:', new Date().toLocaleString()]);
+            report.push([]);
+            report.push(['Metric', 'Value']);
+            report.push(['Total Users', overview.total_users]);
+            report.push(['Generator Owners', overview.total_generator_owners]);
+            report.push(['Total Revenue', `$${overview.total_revenue}`]);
+            report.push(['Pending Issues', overview.pending_issues]);
+            report.push(['New Users This Week', overview.new_users_this_week]);
+            report.push(['User Growth %', `${overview.user_growth.growth_percentage}%`]);
+            report.push(['Revenue Growth %', `${overview.revenue_growth.growth_percentage}%`]);
+
+            const csv = report.map(row => row.join(',')).join('\n');
+            downloadCSV(csv, `dashboard_report_${new Date().toISOString().split('T')[0]}.csv`);
+        } catch (error) {
+            console.error('Export report error:', error);
+            showNotification('Failed to export report', 'danger');
+        }
+    }
+
     function showNotification(message, type) {
         const notification = document.createElement('div');
         notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
@@ -1128,6 +1255,18 @@
     }
     
     // Capitalize First Letter Helper
+    function getStatusColor(status) {
+        const colors = {
+            'active': 'success',
+            'suspended': 'warning',
+            'inactive': 'secondary',
+            'pending': 'info',
+            'completed': 'success',
+            'failed': 'danger'
+        };
+        return colors[status] || 'secondary';
+    }
+
     function capitalizeFirst(str) {
         if (!str) return '';
         return str.charAt(0).toUpperCase() + str.slice(1);

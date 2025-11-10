@@ -180,7 +180,11 @@
             const data = await response.json();
 
             if (data.success) {
-                allPayments = data.data;
+                // Add default status to payments if not present
+                allPayments = data.data.map(payment => ({
+                    ...payment,
+                    status: payment.status || 'completed' // Default to completed if status missing
+                }));
                 displayPayments(allPayments);
                 updatePaymentStats(allPayments);
             }
@@ -314,6 +318,12 @@
 
     async function downloadReceipt(paymentId) {
         try {
+            // Check if PDF utilities are loaded
+            if (!window.PDFUtils) {
+                alert('PDF utilities are not loaded. Please refresh the page.');
+                return;
+            }
+
             const userInfo = {
                 full_name: '<%= user.full_name %>',
                 email: '<%= user.email %>',
@@ -322,13 +332,13 @@
 
             // Find payment
             const payment = allPayments.find(p => p.payment_id === paymentId);
-            
+
             if (payment) {
                 // Get bill info
                 const billsResponse = await fetch(`/api/bills/my`);
                 const billsData = await billsResponse.json();
                 const bill = billsData.data ? billsData.data.find(b => b.bill_id === payment.bill_id) : null;
-                
+
                 // Generate PDF receipt
                 window.PDFUtils.generateReceiptPDF(payment, bill, userInfo);
             } else {
@@ -352,6 +362,12 @@
     function exportPayments() {
         if (!allPayments || allPayments.length === 0) {
             alert('No payments to export');
+            return;
+        }
+
+        // Check if PDF utilities are loaded
+        if (!window.PDFUtils) {
+            alert('PDF utilities are not loaded. Please refresh the page.');
             return;
         }
 

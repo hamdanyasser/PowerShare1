@@ -75,6 +75,32 @@ class UserController {
             });
         }
     }
+
+    // Update user notification preferences
+    async updatePreferences(req, res) {
+        try {
+            const userId = req.user.user_id;
+            const { email_notifications, sms_notifications, reminder_notifications } = req.body;
+
+            // Update preferences in user table
+            await userDAL.updateUser(userId, {
+                email_notifications: email_notifications !== undefined ? email_notifications : true,
+                sms_notifications: sms_notifications !== undefined ? sms_notifications : true,
+                reminder_notifications: reminder_notifications !== undefined ? reminder_notifications : true
+            });
+
+            res.json({
+                success: true,
+                message: 'Preferences updated successfully'
+            });
+        } catch (error) {
+            console.error('Update preferences error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to update preferences'
+            });
+        }
+    }
 }
 
 module.exports = new UserController();
