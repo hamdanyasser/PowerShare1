@@ -1,36 +1,78 @@
 <!-- Footer -->
-<footer class="bg-dark text-white py-4 mt-5">
-    <div class="container">
-        <div class="row">
+<footer class="footer-modern">
+    <div class="footer-divider"></div>
+    <div class="container py-5">
+        <div class="row g-4">
             <div class="col-md-4 mb-3">
-                <h5 class="fw-bold mb-3">
-                    <i class="fas fa-bolt"></i> PowerShare
+                <h5 class="fw-bold mb-3 footer-brand">
+                    <i class="fas fa-bolt text-warning"></i> PowerShare
                 </h5>
-                <p class="text-muted">
+                <p class="footer-text mb-4">
                     Smart generator subscription and electricity schedule management for Lebanon.
                 </p>
+                <div class="social-links">
+                    <a href="#" class="social-icon" aria-label="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
             </div>
-            <div class="col-md-4 mb-3">
-                <h5 class="fw-bold mb-3">Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="/#features" class="text-muted text-decoration-none">Features</a></li>
-                    <li><a href="/#how-it-works" class="text-muted text-decoration-none">How It Works</a></li>
-                    <li><a href="/#pricing" class="text-muted text-decoration-none">Pricing</a></li>
-                    <li><a href="/login" class="text-muted text-decoration-none">Login</a></li>
+            <div class="col-md-3 mb-3">
+                <h6 class="fw-bold mb-3 footer-heading">Quick Links</h6>
+                <ul class="list-unstyled footer-links">
+                    <li><a href="/#features" class="footer-link">Features</a></li>
+                    <li><a href="/#how-it-works" class="footer-link">How It Works</a></li>
+                    <li><a href="/#pricing" class="footer-link">Pricing</a></li>
+                    <li><a href="/login" class="footer-link">Login</a></li>
                 </ul>
             </div>
-            <div class="col-md-4 mb-3">
-                <h5 class="fw-bold mb-3">Contact Us</h5>
-                <p class="text-muted">
-                    <i class="fas fa-envelope me-2"></i>info@powershare.lb<br>
-                    <i class="fas fa-phone me-2"></i>+961 1 234 567<br>
-                    <i class="fas fa-map-marker-alt me-2"></i>Beirut, Lebanon
-                </p>
+            <div class="col-md-2 mb-3">
+                <h6 class="fw-bold mb-3 footer-heading">Support</h6>
+                <ul class="list-unstyled footer-links">
+                    <li><a href="#" class="footer-link">Help Center</a></li>
+                    <li><a href="#" class="footer-link">Privacy Policy</a></li>
+                    <li><a href="#" class="footer-link">Terms of Service</a></li>
+                    <li><a href="#" class="footer-link">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 mb-3">
+                <h6 class="fw-bold mb-3 footer-heading">Contact Us</h6>
+                <ul class="list-unstyled footer-contact">
+                    <li>
+                        <i class="fas fa-envelope me-2"></i>
+                        <a href="mailto:info@powershare.lb" class="footer-link">info@powershare.lb</a>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone me-2"></i>
+                        <a href="tel:+9611234567" class="footer-link">+961 1 234 567</a>
+                    </li>
+                    <li>
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        <span class="footer-text">Beirut, Lebanon</span>
+                    </li>
+                </ul>
             </div>
         </div>
-        <hr class="my-3 bg-secondary">
-        <div class="text-center text-muted">
-            <p class="mb-0">&copy; <%= new Date().getFullYear() %> PowerShare. All rights reserved.</p>
+        <hr class="footer-hr my-4">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="footer-copyright mb-0">
+                    &copy; <%= new Date().getFullYear() %> PowerShare. All rights reserved.
+                </p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <span class="footer-badge">
+                    <i class="fas fa-shield-alt me-1"></i> Secure & Encrypted
+                </span>
+            </div>
         </div>
     </div>
 </footer>
