@@ -4,6 +4,7 @@ const subscriptionDAL = require('../../DAL/subscriptionDAL');
 const userDAL = require('../../DAL/userDAL');
 const generatorDAL = require('../../DAL/generatorDAL');
 const { authenticate, authorize } = require('../middleware/auth');
+const { verifyGeneratorOwnership, verifyOwnerHasGenerator } = require('../middleware/ownershipValidation');
 
 // Get my subscriptions
 router.get('/my', authenticate, async (req, res) => {
@@ -75,7 +76,7 @@ router.post('/subscribe', authenticate, async (req, res) => {
 });
 
 // Get subscribers for a specific generator
-router.get('/generator/:generatorId/subscribers', authenticate, authorize('owner', 'admin'), async (req, res) => {
+router.get('/generator/:generatorId/subscribers', authenticate, authorize('owner', 'admin'), verifyGeneratorOwnership, async (req, res) => {
     try {
         const { generatorId } = req.params;
         const subscribers = await subscriptionDAL.getByGeneratorId(generatorId);
@@ -99,7 +100,7 @@ router.get('/generator/:generatorId/subscribers', authenticate, authorize('owner
 });
 
 // Get subscribers for owner's generator (first one - for backward compatibility)
-router.get('/generator/subscribers', authenticate, authorize('owner', 'admin'), async (req, res) => {
+router.get('/generator/subscribers', authenticate, authorize('owner', 'admin'), verifyOwnerHasGenerator, async (req, res) => {
     try {
         const ownerId = req.user.user_id;
         
