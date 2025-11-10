@@ -115,8 +115,21 @@
             const response = await fetch(`/api/admin/users/${userId}`);
             const data = await response.json();
 
-            if (!data.success) {
-                throw new Error(data.message || 'Failed to load user details');
+            if (!data.success || !data.data) {
+                // User not found or deleted
+                document.getElementById('userInfoCard').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        User not found or has been deleted.
+                    </div>
+                `;
+                document.getElementById('subscriptionsTable').innerHTML = `
+                    <div class="alert alert-warning">No data available for deleted user.</div>
+                `;
+                document.getElementById('paymentsTable').innerHTML = `
+                    <div class="alert alert-warning">No data available for deleted user.</div>
+                `;
+                return;
             }
 
             const userDetail = data.data;

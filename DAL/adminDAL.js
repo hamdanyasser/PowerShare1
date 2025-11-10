@@ -168,13 +168,14 @@ class AdminDAL {
     // Get users with detailed stats
     async getAllUsersWithStats() {
         const [rows] = await db.execute(
-            `SELECT 
+            `SELECT
                 u.user_id,
                 u.full_name,
                 u.email,
                 u.phone,
                 u.address,
                 u.role,
+                u.status,
                 u.created_at,
                 COUNT(DISTINCT s.subscription_id) as subscription_count,
                 COALESCE(SUM(CASE WHEN b.status = 'pending' THEN 1 ELSE 0 END), 0) as pending_bills
@@ -191,7 +192,7 @@ class AdminDAL {
     async getUserDetailById(userId) {
         // Basic user info
         const [userRows] = await db.execute(
-            'SELECT user_id, full_name, email, phone, address, role, created_at FROM users WHERE user_id = ?',
+            'SELECT user_id, full_name, email, phone, address, role, status, created_at FROM users WHERE user_id = ?',
             [userId]
         );
         
